@@ -29,9 +29,10 @@ const DEFAULT_CONFIG = {
   titleColor: '#2D2A26',
 };
 
-// --- STABLE RICH TEXT EDITOR ---
+// --- STABLE RICH TEXT EDITOR WITH AUTO-SCROLL & PADDING FIX ---
 const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDashboard = false }) => {
   const editorRef = useRef(null);
+  const containerRef = useRef(null); // Ref for the scrolling container
   const [activeStates, setActiveStates] = useState({ bold: false, italic: false, underline: false });
   
   useEffect(() => {
@@ -59,6 +60,33 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
       onSave(editorRef.current.innerHTML);
     }
     checkActiveStyles();
+    autoScroll(); // Trigger the auto-scroll check
+  };
+
+  // NEW: Function to keep cursor away from the bottom
+  const autoScroll = () => {
+    if (!editorRef.current || !containerRef.current) return;
+
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    const containerRect = containerRef.current.getBoundingClientRect();
+
+    // Calculate how far the cursor is from the bottom of the visible container
+    const distanceFromBottom = containerRect.bottom - rect.bottom;
+
+    // Threshold: If cursor is within the bottom 40% of the screen...
+    const threshold = containerRect.height * 0.4; 
+
+    if (distanceFromBottom < threshold) {
+      // Smoothly scroll down to push the text up
+      containerRef.current.scrollBy({
+        top: threshold - distanceFromBottom, 
+        behavior: 'smooth'
+      });
+    }
   };
 
   return (
@@ -73,7 +101,13 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
           <div className="text-[9px] font-bold uppercase tracking-widest text-gray-400 px-2">Sans • 11pt</div>
         </div>
       )}
-      <div className="flex-1 overflow-y-auto custom-scrollbar bg-white flex flex-col">
+      {/* ADDED: ref={containerRef} to control scrolling.
+         ADDED: paddingBottom: '50vh' to force massive space at the bottom.
+      */}
+      <div 
+        ref={containerRef}
+        className="flex-1 overflow-y-auto custom-scrollbar bg-white flex flex-col"
+      >
         <div
           ref={editorRef}
           contentEditable={isEditing}
@@ -81,8 +115,12 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
           onMouseUp={handleInput}
           onInput={handleInput}
           onBlur={handleInput}
-          className={`outline-none font-sans text-[11pt] text-[#2D2A26] ${isDashboard ? 'px-4 py-4' : 'px-10 py-10'} min-h-full transition-all ${isEditing ? 'bg-white' : 'bg-transparent cursor-default'}`}
-          style={{ lineHeight: '1.6', wordBreak: 'break-word' }}
+          className={`outline-none font-sans text-[11pt] text-[#2D2A26] ${isDashboard ? 'px-4 py-4' : 'px-10 pt-10'} min-h-full transition-all ${isEditing ? 'bg-white' : 'bg-transparent cursor-default'}`}
+          style={{ 
+            lineHeight: '1.6', 
+            wordBreak: 'break-word',
+            paddingBottom: isDashboard ? '2rem' : '50vh' // Force 50% viewport height padding
+          }}
         />
       </div>
     </div>
@@ -431,7 +469,6 @@ export default function App() {
                     </div>
                     {activeDay === item.day && (
                       <div className="p-16 bg-[#F5F2E8]/30 border-t border-[#F5F2E8] animate-in slide-in-from-top-4">
-                        {/* CHANGED TO ITEMS-START (Was items-stretch) to support sticky right column */}
                         <div className="grid lg:grid-cols-2 gap-20 items-start">
                           {/* LEFT COLUMN: Main Content */}
                           <div className="space-y-12 pb-12 min-h-[600px]">
@@ -440,7 +477,7 @@ export default function App() {
                             <div className="p-8 bg-[#C6A87C]/5 rounded-2xl border border-[#C6A87C]/20 relative overflow-hidden"><div className="absolute top-0 left-0 w-1 h-full bg-[#C6A87C]"></div><h4 className="text-[10px] uppercase tracking-widest text-[#C6A87C] font-bold mb-4 flex items-center gap-2"><Sparkles size={14} /> Prayer Guide</h4><p className="font-serif italic text-gray-700 text-lg">{item.prayer}</p></div>
                             <div className="p-8 bg-black/[0.02] rounded-2xl border border-dashed border-[#C6A87C]/30 relative overflow-hidden"><h4 className="text-[10px] uppercase tracking-widest text-[#C6A87C] font-bold mb-4 flex items-center gap-2"><Zap size={14} /> Action / Challenge Step</h4><p className="font-serif text-gray-700 text-lg">{item.challenge}</p></div>
                           </div>
-                          {/* RIGHT COLUMN: STICKY FIX APPLIED HERE */}
+                          {/* RIGHT COLUMN: STICKY FIX & SCROLL FIX APPLIED */}
                           <div className="sticky top-6 h-[calc(100vh-6rem)] flex flex-col">
                             <div className="flex items-center justify-between mb-6 shrink-0"><div className="flex flex-col"><h4 className="font-sans font-bold text-2xl text-[#4A3F35]">My Heart's Reflection</h4>{entries[`day-${item.day}`]?.updatedAt && <div className="text-[9px] text-gray-400 font-bold uppercase mt-1"><Clock size={10} className="inline mr-1" /> Last edited: {formatDate(entries[`day-${item.day}`].updatedAt)}</div>}</div><button onClick={() => setIsEditingEntry(!isEditingEntry)} className={`p-4 rounded-full shadow-lg transition-all ${isEditingEntry ? 'bg-[#C6A87C] text-white shadow-xl' : 'bg-white text-gray-400 hover:text-[#C6A87C]'}`}>{isEditingEntry ? <Save size={20} /> : <Pencil size={20} />}</button></div>
                             <div className="flex-1 overflow-hidden h-full">
