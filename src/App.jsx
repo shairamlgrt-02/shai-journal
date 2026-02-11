@@ -35,7 +35,7 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
   const [activeStates, setActiveStates] = useState({ bold: false, italic: false, underline: false });
   
   useEffect(() => {
-    if (editorRef.current && editorRef.current.innerHTML !== initialValue) {
+    if (editorRef.current && editorRef.current.innerHTML !== (initialValue || '')) {
       editorRef.current.innerHTML = initialValue || '';
     }
   }, [initialValue]);
@@ -62,7 +62,7 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
   };
 
   return (
-    <div className={`flex flex-col bg-white rounded-xl border ${isDashboard ? 'border-gray-300 shadow-md' : 'border-gray-100 shadow-sm'} overflow-hidden h-full`} style={{ minHeight }}>
+    <div className={`flex flex-col bg-white rounded-xl border ${isDashboard ? 'border-gray-400 shadow-md' : 'border-gray-100 shadow-sm'} overflow-hidden h-full`} style={{ minHeight }}>
       {isEditing && (
         <div className="flex items-center justify-between p-2 border-b border-gray-200 bg-gray-50/50 sticky top-0 z-30">
           <div className="flex items-center gap-1">
@@ -286,12 +286,12 @@ export default function App() {
             <div className="space-y-6 bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200 animate-in fade-in">
                <h2 className="text-2xl font-serif font-bold text-[#2D2A26] mb-6 border-b pb-4">Branding & Text</h2>
                <div className="space-y-6">
-                 <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Main Hero Title</label><input className="w-full p-4 bg-[#FDFCF6] border border-gray-300 rounded-xl outline-none focus:ring-1 focus:ring-[#C6A87C]" value={siteConfig.heroTitle} onChange={(e) => saveSiteConfig({...siteConfig, heroTitle: e.target.value})} /></div>
+                 <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Main Hero Title</label><input className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none focus:ring-1 focus:ring-[#C6A87C]" value={siteConfig.heroTitle} onChange={(e) => saveSiteConfig({...siteConfig, heroTitle: e.target.value})} /></div>
                  <div className="grid grid-cols-2 gap-6">
-                    <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Subtitle</label><input className="w-full p-4 bg-[#FDFCF6] border border-gray-300 rounded-xl outline-none" value={siteConfig.heroSubtitle} onChange={(e) => saveSiteConfig({...siteConfig, heroSubtitle: e.target.value})} /></div>
-                    <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Focus Badge</label><input className="w-full p-4 bg-[#FDFCF6] border border-gray-300 rounded-xl outline-none" value={siteConfig.heroNote} onChange={(e) => saveSiteConfig({...siteConfig, heroNote: e.target.value})} /></div>
+                   <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Subtitle</label><input className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none" value={siteConfig.heroSubtitle} onChange={(e) => saveSiteConfig({...siteConfig, heroSubtitle: e.target.value})} /></div>
+                   <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Focus Badge</label><input className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none" value={siteConfig.heroNote} onChange={(e) => saveSiteConfig({...siteConfig, heroNote: e.target.value})} /></div>
                  </div>
-                 <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Description</label><textarea className="w-full p-4 bg-[#FDFCF6] border border-gray-300 rounded-xl outline-none h-32" value={siteConfig.heroDescription} onChange={(e) => saveSiteConfig({...siteConfig, heroDescription: e.target.value})} /></div>
+                 <div><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Description</label><textarea className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none h-32" value={siteConfig.heroDescription} onChange={(e) => saveSiteConfig({...siteConfig, heroDescription: e.target.value})} /></div>
                </div>
             </div>
           )}
@@ -300,10 +300,10 @@ export default function App() {
               <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200">
                 <h2 className="text-xl font-serif font-bold text-[#2D2A26] mb-6 flex items-center gap-2">{editingNotebookId ? <Edit3 size={20} className="text-[#C6A87C]" /> : <Plus size={20} className="text-[#C6A87C]" />}{editingNotebookId ? 'Edit Journal' : 'Create New Journal'}</h2>
                 <div className="grid md:grid-cols-2 gap-4 mb-4">
-                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Title</label><input className="w-full p-3 bg-[#FDFCF6] border border-gray-300 rounded-xl font-sans text-sm outline-none" value={notebookForm.title} onChange={(e) => setNotebookForm({ ...notebookForm, title: e.target.value })} /></div>
-                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Subtitle</label><input className="w-full p-3 bg-[#FDFCF6] border border-gray-300 rounded-xl font-sans text-sm outline-none" value={notebookForm.subtitle} onChange={(e) => setNotebookForm({ ...notebookForm, subtitle: e.target.value })} /></div>
-                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Start Date</label><input type="date" className="w-full p-3 bg-[#FDFCF6] border border-gray-300 rounded-xl text-sm outline-none" value={notebookForm.startDate} onChange={(e) => setNotebookForm({ ...notebookForm, startDate: e.target.value })} /></div>
-                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Finish Date</label><input type="date" className="w-full p-3 bg-[#FDFCF6] border border-gray-300 rounded-xl text-sm outline-none" value={notebookForm.finishDate} onChange={(e) => setNotebookForm({ ...notebookForm, finishDate: e.target.value })} /></div>
+                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Title</label><input className="w-full p-3 bg-white border border-gray-400 rounded-xl font-sans text-sm outline-none" value={notebookForm.title} onChange={(e) => setNotebookForm({ ...notebookForm, title: e.target.value })} /></div>
+                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Subtitle</label><input className="w-full p-3 bg-white border border-gray-400 rounded-xl font-sans text-sm outline-none" value={notebookForm.subtitle} onChange={(e) => setNotebookForm({ ...notebookForm, subtitle: e.target.value })} /></div>
+                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Start Date</label><input type="date" className="w-full p-3 bg-white border border-gray-400 rounded-xl text-sm outline-none" value={notebookForm.startDate} onChange={(e) => setNotebookForm({ ...notebookForm, startDate: e.target.value })} /></div>
+                  <div className="space-y-1"><label className="text-[9px] uppercase font-bold text-gray-400 ml-1">Finish Date</label><input type="date" className="w-full p-3 bg-white border border-gray-400 rounded-xl text-sm outline-none" value={notebookForm.finishDate} onChange={(e) => setNotebookForm({ ...notebookForm, finishDate: e.target.value })} /></div>
                 </div>
                 <div className="flex gap-4 items-center"><div className="flex-1"><input type="color" className="w-full h-10 rounded cursor-pointer" value={notebookForm.color} onChange={(e) => setNotebookForm({ ...notebookForm, color: e.target.value })} /></div><button onClick={saveNotebook} className="px-8 py-3 bg-[#2D2A26] text-white rounded-xl font-bold text-sm uppercase tracking-widest hover:bg-[#C6A87C] transition-colors">{editingNotebookId ? 'Update' : 'Create'}</button></div>
               </div>
@@ -313,13 +313,13 @@ export default function App() {
           {adminTab === 'content' && (
             <div className="space-y-6 bg-white p-10 rounded-[2.5rem] shadow-sm border border-gray-200">
               <h2 className="text-2xl font-serif font-bold text-[#2D2A26] mb-8 border-b pb-4">Manage Devotional Days</h2>
-              <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Select Journal</label><select className="w-full p-4 bg-[#FDFCF6] border border-gray-300 rounded-xl outline-none mb-8" onChange={(e) => setSelectedContentNotebook(e.target.value)} value={selectedContentNotebook || ''}><option value="">-- Choose Journal --</option>{notebooks.map(nb => <option key={nb.id} value={nb.id}>{nb.title}</option>)}</select></div>
+              <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Select Journal</label><select className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none mb-8" onChange={(e) => setSelectedContentNotebook(e.target.value)} value={selectedContentNotebook || ''}><option value="">-- Choose Journal --</option>{notebooks.map(nb => <option key={nb.id} value={nb.id}>{nb.title}</option>)}</select></div>
               {selectedContentNotebook && (
                 <div className="space-y-3">
                   <button onClick={() => setIsAddingDay(!isAddingDay)} className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-400 hover:border-[#C6A87C] flex items-center justify-center gap-2 transition-all"><Plus size={18}/> {isAddingDay ? 'Cancel' : 'Add New Day'}</button>
                   {isAddingDay && (
                     <div className="p-6 bg-[#FDFCF6] rounded-2xl border border-gray-200 space-y-4">
-                      <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Theme Title</label><input placeholder="New Day Theme" className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm" value={newDayForm.theme} onChange={(e) => setNewDayForm({...newDayForm, theme: e.target.value})} /></div>
+                      <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Theme Title</label><input placeholder="New Day Theme" className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm" value={newDayForm.theme} onChange={(e) => setNewDayForm({...newDayForm, theme: e.target.value})} /></div>
                       <button onClick={handleAddDay} className="w-full py-4 bg-[#C6A87C] text-white rounded-xl font-bold">Add to Journal</button>
                     </div>
                   )}
@@ -332,18 +332,18 @@ export default function App() {
                       {editingGuideDay?.day === day.day && (
                         <div className="p-8 bg-[#FDFCF6] border-t border-gray-200 space-y-5 animate-in slide-in-from-top-2">
                            <div className="grid grid-cols-2 gap-4">
-                             <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Theme Title</label><input className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm" value={editingGuideDay.theme} onChange={(e) => setEditingGuideDay({...editingGuideDay, theme: e.target.value})} /></div>
-                             <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Date</label><input type="date" className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm" value={editingGuideDay.date} onChange={(e) => setEditingGuideDay({...editingGuideDay, date: e.target.value})} /></div>
+                             <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Theme Title</label><input className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm" value={editingGuideDay.theme} onChange={(e) => setEditingGuideDay({...editingGuideDay, theme: e.target.value})} /></div>
+                             <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Date</label><input type="date" className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm" value={editingGuideDay.date} onChange={(e) => setEditingGuideDay({...editingGuideDay, date: e.target.value})} /></div>
                            </div>
-                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Tags (separated by commas)</label><input className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm" value={editingGuideDay.tags} onChange={(e) => setEditingGuideDay({...editingGuideDay, tags: e.target.value})} /></div>
-                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Scripture Reference</label><input className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm italic" value={editingGuideDay.scripture} onChange={(e) => setEditingGuideDay({...editingGuideDay, scripture: e.target.value})} /></div>
-                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Full Scripture Text</label><textarea className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm italic h-24" value={editingGuideDay.scriptureText} onChange={(e) => setEditingGuideDay({...editingGuideDay, scriptureText: e.target.value})} /></div>
+                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Tags (separated by commas)</label><input className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm" value={editingGuideDay.tags} onChange={(e) => setEditingGuideDay({...editingGuideDay, tags: e.target.value})} /></div>
+                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Scripture Reference</label><input className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm italic" value={editingGuideDay.scripture} onChange={(e) => setEditingGuideDay({...editingGuideDay, scripture: e.target.value})} /></div>
+                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Full Scripture Text</label><textarea className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm italic h-24" value={editingGuideDay.scriptureText} onChange={(e) => setEditingGuideDay({...editingGuideDay, scriptureText: e.target.value})} /></div>
                            <div className="space-y-1">
                              <label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Reflection Body Content</label>
-                             <RichEditor key={`dashboard-editor-${editingGuideDay.day}`} isDashboard={true} height="250px" isEditing={true} initialValue={editingGuideDay.reflection} onSave={(val) => setEditingGuideDay({...editingGuideDay, reflection: val})} />
+                             <RichEditor key={`dashboard-editor-${editingGuideDay.day}`} isDashboard={true} height="250px" isEditing={true} initialValue={editingGuideDay.reflection || ''} onSave={(val) => setEditingGuideDay({...editingGuideDay, reflection: val})} />
                            </div>
-                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Prayer Guide</label><textarea className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm h-24 font-serif" value={editingGuideDay.prayer} onChange={(e) => setEditingGuideDay({...editingGuideDay, prayer: e.target.value})} /></div>
-                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-[#C6A87C] ml-1">Action Step / Challenge</label><textarea placeholder="One step for today..." className="w-full p-4 bg-white border border-gray-300 rounded-xl outline-none text-sm h-24 font-serif" value={editingGuideDay.challenge} onChange={(e) => setEditingGuideDay({...editingGuideDay, challenge: e.target.value})} /></div>
+                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-gray-400 ml-1">Prayer Guide</label><textarea className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm h-24 font-serif" value={editingGuideDay.prayer} onChange={(e) => setEditingGuideDay({...editingGuideDay, prayer: e.target.value})} /></div>
+                           <div className="space-y-1"><label className="text-[10px] uppercase font-bold text-[#C6A87C] ml-1">Action Step / Challenge</label><textarea placeholder="One step for today..." className="w-full p-4 bg-white border border-gray-400 rounded-xl outline-none text-sm h-24 font-serif" value={editingGuideDay.challenge} onChange={(e) => setEditingGuideDay({...editingGuideDay, challenge: e.target.value})} /></div>
                            <button onClick={saveGuideContent} className="w-full py-4 bg-[#2D2A26] text-white rounded-xl font-bold shadow-lg hover:bg-[#C6A87C] transition-all"><Save size={18} className="inline mr-2" /> Save Content Changes</button>
                         </div>
                       )}
@@ -431,14 +431,22 @@ export default function App() {
                     </div>
                     {activeDay === item.day && (
                       <div className="p-16 bg-[#F5F2E8]/30 border-t border-[#F5F2E8] animate-in slide-in-from-top-4">
-                        <div className="grid lg:grid-cols-2 gap-20 items-stretch">
-                          <div className="space-y-12">
+                        {/* CHANGED TO ITEMS-START (Was items-stretch) to support sticky right column */}
+                        <div className="grid lg:grid-cols-2 gap-20 items-start">
+                          {/* LEFT COLUMN: Main Content */}
+                          <div className="space-y-12 pb-12 min-h-[600px]">
                             <div><h4 className="text-[10px] uppercase tracking-widest text-[#C6A87C] font-bold mb-6 flex items-center gap-2"><div className="h-[1px] w-8 bg-[#C6A87C]"></div>Scripture Focus</h4><p className="text-3xl font-serif italic text-[#2D2A26] leading-relaxed drop-shadow-sm">"{item.scriptureText}"</p></div>
                             <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100"><h4 className="text-[10px] uppercase tracking-widest text-[#C6A87C] font-bold mb-4">Reflection</h4><div className="max-h-[300px] overflow-y-auto custom-scrollbar pr-4 text-gray-600 leading-loose text-lg font-sans" dangerouslySetInnerHTML={{ __html: item.reflection }} /></div>
                             <div className="p-8 bg-[#C6A87C]/5 rounded-2xl border border-[#C6A87C]/20 relative overflow-hidden"><div className="absolute top-0 left-0 w-1 h-full bg-[#C6A87C]"></div><h4 className="text-[10px] uppercase tracking-widest text-[#C6A87C] font-bold mb-4 flex items-center gap-2"><Sparkles size={14} /> Prayer Guide</h4><p className="font-serif italic text-gray-700 text-lg">{item.prayer}</p></div>
                             <div className="p-8 bg-black/[0.02] rounded-2xl border border-dashed border-[#C6A87C]/30 relative overflow-hidden"><h4 className="text-[10px] uppercase tracking-widest text-[#C6A87C] font-bold mb-4 flex items-center gap-2"><Zap size={14} /> Action / Challenge Step</h4><p className="font-serif text-gray-700 text-lg">{item.challenge}</p></div>
                           </div>
-                          <div className="flex flex-col h-full min-h-[600px]"><div className="flex items-center justify-between mb-6"><div className="flex flex-col"><h4 className="font-sans font-bold text-2xl text-[#4A3F35]">My Heart's Reflection</h4>{entries[`day-${item.day}`]?.updatedAt && <div className="text-[9px] text-gray-400 font-bold uppercase mt-1"><Clock size={10} className="inline mr-1" /> Last edited: {formatDate(entries[`day-${item.day}`].updatedAt)}</div>}</div><button onClick={() => setIsEditingEntry(!isEditingEntry)} className={`p-4 rounded-full shadow-lg transition-all ${isEditingEntry ? 'bg-[#C6A87C] text-white shadow-xl' : 'bg-white text-gray-400 hover:text-[#C6A87C]'}`}>{isEditingEntry ? <Save size={20} /> : <Pencil size={20} />}</button></div><div className="flex-1 overflow-hidden h-full"><RichEditor minHeight="100%" initialValue={entries[`day-${item.day}`]?.text} onSave={(val) => saveEntry(item.day, val)} isEditing={isEditingEntry} /></div></div>
+                          {/* RIGHT COLUMN: STICKY FIX APPLIED HERE */}
+                          <div className="sticky top-6 h-[calc(100vh-6rem)] flex flex-col">
+                            <div className="flex items-center justify-between mb-6 shrink-0"><div className="flex flex-col"><h4 className="font-sans font-bold text-2xl text-[#4A3F35]">My Heart's Reflection</h4>{entries[`day-${item.day}`]?.updatedAt && <div className="text-[9px] text-gray-400 font-bold uppercase mt-1"><Clock size={10} className="inline mr-1" /> Last edited: {formatDate(entries[`day-${item.day}`].updatedAt)}</div>}</div><button onClick={() => setIsEditingEntry(!isEditingEntry)} className={`p-4 rounded-full shadow-lg transition-all ${isEditingEntry ? 'bg-[#C6A87C] text-white shadow-xl' : 'bg-white text-gray-400 hover:text-[#C6A87C]'}`}>{isEditingEntry ? <Save size={20} /> : <Pencil size={20} />}</button></div>
+                            <div className="flex-1 overflow-hidden h-full">
+                              <RichEditor minHeight="100%" initialValue={entries[`day-${item.day}`]?.text} onSave={(val) => saveEntry(item.day, val)} isEditing={isEditingEntry} />
+                            </div>
+                          </div>
                         </div>
                       </div>
                     )}
