@@ -29,10 +29,9 @@ const DEFAULT_CONFIG = {
   titleColor: '#2D2A26',
 };
 
-// --- STABLE RICH TEXT EDITOR WITH AUTO-SCROLL & PADDING FIX ---
+// --- RICH EDITOR: CARD STYLE WITH TUNED SPACING ---
 const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDashboard = false }) => {
   const editorRef = useRef(null);
-  const containerRef = useRef(null); // Ref for the scrolling container
   const [activeStates, setActiveStates] = useState({ bold: false, italic: false, underline: false });
   
   useEffect(() => {
@@ -60,69 +59,54 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
       onSave(editorRef.current.innerHTML);
     }
     checkActiveStyles();
-    autoScroll(); // Trigger the auto-scroll check
-  };
-
-  // NEW: Function to keep cursor away from the bottom
-  const autoScroll = () => {
-    if (!editorRef.current || !containerRef.current) return;
-
-    const selection = window.getSelection();
-    if (!selection.rangeCount) return;
-
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    const containerRect = containerRef.current.getBoundingClientRect();
-
-    // Calculate how far the cursor is from the bottom of the visible container
-    const distanceFromBottom = containerRect.bottom - rect.bottom;
-
-    // Threshold: If cursor is within the bottom 40% of the screen...
-    const threshold = containerRect.height * 0.4; 
-
-    if (distanceFromBottom < threshold) {
-      // Smoothly scroll down to push the text up
-      containerRef.current.scrollBy({
-        top: threshold - distanceFromBottom, 
-        behavior: 'smooth'
-      });
-    }
   };
 
   return (
-    <div className={`flex flex-col bg-white rounded-xl border ${isDashboard ? 'border-gray-400 shadow-md' : 'border-gray-100 shadow-sm'} overflow-hidden h-full`} style={{ minHeight }}>
+    // CARD CONTAINER
+    <div className={`flex flex-col bg-white rounded-[1.5rem] border ${isDashboard ? 'border-gray-400 shadow-md' : 'border-gray-100 shadow-sm'} overflow-hidden h-full relative`} style={{ minHeight }}>
+      
+      {/* SCROLLABLE AREA */}
+      <div 
+        className="flex-1 overflow-y-auto custom-scrollbar bg-white relative"
+        onClick={() => {
+            if(editorRef.current) editorRef.current.focus();
+        }}
+      >
+        {/* PADDING WRAPPER: ample padding around text */}
+        <div className="min-h-full p-8 md:p-10">
+          <div
+            ref={editorRef}
+            contentEditable={isEditing}
+            onKeyUp={handleInput}
+            onMouseUp={handleInput}
+            onInput={handleInput}
+            onBlur={handleInput}
+            className={`outline-none font-sans text-[11pt] text-[#2D2A26] transition-all ${isEditing ? 'bg-white' : 'bg-transparent cursor-default'}`}
+            style={{ 
+              lineHeight: '1.8', 
+              wordBreak: 'break-word',
+              display: 'block'
+            }}
+          />
+          
+          {/* SPACER: REDUCED from 50vh to 150px */}
+          {/* This is enough space to lift the last line above the toolbar, but not excessive. */}
+          {isEditing && <div className="h-[150px] w-full" />}
+        </div>
+      </div>
+
+      {/* FOOTER TOOLBAR */}
       {isEditing && (
-        <div className="flex items-center justify-between p-2 border-b border-gray-200 bg-gray-50/50 sticky top-0 z-30">
-          <div className="flex items-center gap-1">
-            <button onMouseDown={(e) => { e.preventDefault(); exec('bold'); }} className={`p-1.5 rounded transition-all ${activeStates.bold ? 'bg-[#C6A87C] text-white shadow-sm' : 'hover:bg-gray-100 text-gray-400'}`}><Bold size={14} /></button>
-            <button onMouseDown={(e) => { e.preventDefault(); exec('italic'); }} className={`p-1.5 rounded transition-all ${activeStates.italic ? 'bg-[#C6A87C] text-white shadow-sm' : 'hover:bg-gray-100 text-gray-400'}`}><Italic size={14} /></button>
-            <button onMouseDown={(e) => { e.preventDefault(); exec('underline'); }} className={`p-1.5 rounded transition-all ${activeStates.underline ? 'bg-[#C6A87C] text-white shadow-sm' : 'hover:bg-white text-gray-400'}`}><Underline size={14} /></button>
+        <div className="flex-shrink-0 flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-white z-30">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-bold uppercase tracking-widest text-gray-300 mr-2">Format</span>
+            <button onMouseDown={(e) => { e.preventDefault(); exec('bold'); }} className={`p-2 rounded-lg transition-all ${activeStates.bold ? 'bg-[#C6A87C] text-white shadow-md' : 'hover:bg-white text-gray-400 hover:shadow-sm'}`}><Bold size={16} /></button>
+            <button onMouseDown={(e) => { e.preventDefault(); exec('italic'); }} className={`p-2 rounded-lg transition-all ${activeStates.italic ? 'bg-[#C6A87C] text-white shadow-md' : 'hover:bg-white text-gray-400 hover:shadow-sm'}`}><Italic size={16} /></button>
+            <button onMouseDown={(e) => { e.preventDefault(); exec('underline'); }} className={`p-2 rounded-lg transition-all ${activeStates.underline ? 'bg-[#C6A87C] text-white shadow-md' : 'hover:bg-white text-gray-400 hover:shadow-sm'}`}><Underline size={16} /></button>
           </div>
-          <div className="text-[9px] font-bold uppercase tracking-widest text-gray-400 px-2">Sans • 11pt</div>
+          <div className="text-[9px] font-bold uppercase tracking-widest text-gray-400 px-2">Sans Serif • 11pt</div>
         </div>
       )}
-      {/* ADDED: ref={containerRef} to control scrolling.
-         ADDED: paddingBottom: '50vh' to force massive space at the bottom.
-      */}
-      <div 
-        ref={containerRef}
-        className="flex-1 overflow-y-auto custom-scrollbar bg-white flex flex-col"
-      >
-        <div
-          ref={editorRef}
-          contentEditable={isEditing}
-          onKeyUp={handleInput}
-          onMouseUp={handleInput}
-          onInput={handleInput}
-          onBlur={handleInput}
-          className={`outline-none font-sans text-[11pt] text-[#2D2A26] ${isDashboard ? 'px-4 py-4' : 'px-10 pt-10'} min-h-full transition-all ${isEditing ? 'bg-white' : 'bg-transparent cursor-default'}`}
-          style={{ 
-            lineHeight: '1.6', 
-            wordBreak: 'break-word',
-            paddingBottom: isDashboard ? '2rem' : '50vh' // Force 50% viewport height padding
-          }}
-        />
-      </div>
     </div>
   );
 };
