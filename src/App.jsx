@@ -29,9 +29,10 @@ const DEFAULT_CONFIG = {
   titleColor: '#2D2A26',
 };
 
-// --- RICH EDITOR: CARD STYLE WITH TUNED SPACING ---
+// --- RICH EDITOR: CARD STYLE + AUTO SCROLL FIXED ---
 const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDashboard = false }) => {
   const editorRef = useRef(null);
+  const scrollContainerRef = useRef(null); // Reference to the scrolling wrapper
   const [activeStates, setActiveStates] = useState({ bold: false, italic: false, underline: false });
   
   useEffect(() => {
@@ -54,25 +55,54 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
     checkActiveStyles();
   };
 
+  // --- THE AUTO-SCROLL ENGINE ---
+  const handleAutoScroll = () => {
+    if (!scrollContainerRef.current) return;
+    
+    const selection = window.getSelection();
+    if (!selection.rangeCount) return;
+    
+    const range = selection.getRangeAt(0);
+    const rect = range.getBoundingClientRect();
+    const containerRect = scrollContainerRef.current.getBoundingClientRect();
+    
+    // Define a "Trigger Zone" at the bottom (e.g., last 100px of the view)
+    const triggerZone = containerRect.bottom - 100;
+
+    // If cursor is below the trigger zone, scroll down
+    if (rect.bottom > triggerZone) {
+      // Calculate how much we need to scroll to bring it back up
+      // Adding extra buffer (50px) to snap it up a bit more aggressively
+      const scrollAmount = rect.bottom - triggerZone + 50;
+      scrollContainerRef.current.scrollBy({
+        top: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const handleInput = () => {
     if (onSave && editorRef.current) {
       onSave(editorRef.current.innerHTML);
     }
     checkActiveStyles();
+    // Trigger scroll check on every keystroke
+    handleAutoScroll();
   };
 
   return (
     // CARD CONTAINER
     <div className={`flex flex-col bg-white rounded-[1.5rem] border ${isDashboard ? 'border-gray-400 shadow-md' : 'border-gray-100 shadow-sm'} overflow-hidden h-full relative`} style={{ minHeight }}>
       
-      {/* SCROLLABLE AREA */}
+      {/* SCROLLABLE AREA - Now attached to scrollContainerRef */}
       <div 
-        className="flex-1 overflow-y-auto custom-scrollbar bg-white relative"
+        ref={scrollContainerRef}
+        className="flex-1 overflow-y-auto custom-scrollbar bg-white relative scroll-smooth"
         onClick={() => {
             if(editorRef.current) editorRef.current.focus();
         }}
       >
-        {/* PADDING WRAPPER: ample padding around text */}
+        {/* PADDING WRAPPER */}
         <div className="min-h-full p-8 md:p-10">
           <div
             ref={editorRef}
@@ -89,8 +119,7 @@ const RichEditor = ({ initialValue, onSave, isEditing, minHeight = "auto", isDas
             }}
           />
           
-          {/* SPACER: REDUCED from 50vh to 150px */}
-          {/* This is enough space to lift the last line above the toolbar, but not excessive. */}
+          {/* SPACER: 150px Cushion to allow scrolling past text */}
           {isEditing && <div className="h-[150px] w-full" />}
         </div>
       </div>
